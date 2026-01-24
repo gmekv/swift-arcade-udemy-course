@@ -1,9 +1,3 @@
-//
-//  AccountSummaryHeaderView.swift
-//  Bankey
-//
-//  Created by jrasmusson on 2021-10-28.
-//
 
 import UIKit
 

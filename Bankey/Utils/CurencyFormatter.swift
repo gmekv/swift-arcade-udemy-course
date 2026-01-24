@@ -1,9 +1,4 @@
-//
-//  CurrencyFormatter.swift
-//  Bankey
-//
-//  Created by jrasmusson on 2021-11-08.
-//
+
 
 import UIKit
 

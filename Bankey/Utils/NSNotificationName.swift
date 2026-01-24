@@ -1,9 +1,3 @@
-//
-//  NSNotificationName.swift
-//  Bankey
-//
-//  Created by jrasmusson on 2021-11-13.
-//
 
 import Foundation
 
