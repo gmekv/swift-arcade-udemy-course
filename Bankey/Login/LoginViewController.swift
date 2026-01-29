@@ -148,8 +148,9 @@ extension LoginViewController {
             assertionFailure("Username / password should never be nil")
             return
         }
-
-
+//        if username.isEmpty ||  password.isEmpty {
+//            configureView(withMessage: "Username / password cannot be blank")
+//        }
         
         if username == "" && password == "" {
             signInButton.configuration?.showsActivityIndicator = true
@@ -162,12 +163,24 @@ extension LoginViewController {
     private func configureView(withMessage message: String) {
         errorMessageLabel.isHidden = false
         errorMessageLabel.text = message
+        shakeButton()
+    }
+    
+    private func shakeButton() {
+        let animation = CAKeyframeAnimation()
+        animation.keyPath = "position.x"
+        animation.values = [0, 10, -10, 10, 0]
+        animation.keyTimes = [0, 0.16, 0.5, 0.83, 1]
+        animation.duration = 0.4
+        animation.isAdditive = true
+        signInButton.layer.add(animation, forKey: "shake")
+        
     }
 }
 
 extension LoginViewController {
     private func animate() {
-        let  duration = 2.0
+        let  duration = 1.0
         let titleAnimator = UIViewPropertyAnimator(duration: 1, curve: .easeInOut) {
             self.titleLeadingAnchor?.constant = self.leadingEndgeOnScreen
             self.view.layoutIfNeeded()
@@ -184,13 +197,13 @@ extension LoginViewController {
             self.titleLabel.alpha = 1
             self.view.layoutIfNeeded()
         }
-        titledarkening.startAnimation(afterDelay: 2)
+        titledarkening.startAnimation(afterDelay: 1)
         
         let subtitledarkening  = UIViewPropertyAnimator(duration: duration, curve: .easeInOut) {
             self.subtitleLabel.alpha = 1
             self.view.layoutIfNeeded()
         }
-        subtitledarkening.startAnimation(afterDelay: 2.5)
+        subtitledarkening.startAnimation(afterDelay: 1.5)
     }
     
 }

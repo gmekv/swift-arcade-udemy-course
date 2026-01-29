@@ -25,19 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         loginViewController.delegate = self
         onboardingContainerViewController.delegate = self
         
-        let vc = mainViewController
-        vc.setStatusBar()
+        // Configure navigation bar appearance globally
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = appColor
+        appearance.shadowColor = .clear  // Removes the bottom line
         
-        UINavigationBar.appearance().isTranslucent = true
-        UINavigationBar.appearance().backgroundColor = appColor
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().isTranslucent = false
         
         displayLogin()
-        registerForNotifications()
         return true
-    }
-    
-    private func registerForNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(didLogout), name: .logout, object: nil)
     }
     
     
@@ -56,16 +55,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     private func prepMainView() {
-        mainViewController.setStatusBar()
-        UINavigationBar.appearance().isTranslucent = true
-        UINavigationBar.appearance().backgroundColor = appColor
+        // Navigation bar is already configured globally in didFinishLaunchingWithOptions
     }
     
     
 }
 
 extension AppDelegate: LoginViewControllerDelegate, OnboardingContainerViewControllerDelegate, LogoutDelegate {
-   @objc func didLogout() {
+    func didLogout() {
         setRootViewController(loginViewController)
     }
     
