@@ -1,11 +1,24 @@
-
 import UIKit
 
 class AccountSummaryHeaderView: UIView {
     
     @IBOutlet var contentView: UIView!
     
-    let shakyBellView = ShakeyBellView()
+    @IBOutlet var welcomeLabel: UILabel!
+    @IBOutlet var nameLabel: UILabel!
+    @IBOutlet var dateLabel: UILabel!
+    
+    let shakeyBellView = ShakeyBellView()
+    
+    struct ViewModel {
+        let welcomeMessage: String
+        let name: String
+        let date: Date
+        
+        var dateFormatted: String {
+            return date.monthDayYearString
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,15 +46,22 @@ class AccountSummaryHeaderView: UIView {
         contentView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
-        setupShakyBellView()
+        setupShakeyBell()
     }
     
-    private func setupShakyBellView() {
-        shakyBellView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(shakyBellView)
+    private func setupShakeyBell() {
+        shakeyBellView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(shakeyBellView)
+        
         NSLayoutConstraint.activate([
-            shakyBellView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            shakyBellView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            shakeyBellView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            shakeyBellView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
-            }
+    }
+    
+    func configure(viewModel: ViewModel) {
+        welcomeLabel.text = viewModel.welcomeMessage
+        nameLabel.text = viewModel.name
+        dateLabel.text = viewModel.dateFormatted
+    }
 }
