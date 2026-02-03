@@ -22,13 +22,8 @@ class AccountSummaryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        setupNavigationBar()
     }
-    
-    func setupNavigationBar() {
-        navigationItem.rightBarButtonItem = logoutBarButtonItem
     }
-}
 
 extension AccountSummaryViewController {
     private func setup() {
@@ -36,6 +31,8 @@ extension AccountSummaryViewController {
         setupTableHeaderView()
 //        fetchAccounts()
         fetchDataAndLoadViews()
+        setupNavigationBar()
+
     }
     
     private func setupTableView() {
@@ -88,6 +85,11 @@ extension AccountSummaryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
     }
+    
+    func setupNavigationBar() {
+        navigationItem.rightBarButtonItem = logoutBarButtonItem
+    }
+
 }
 
 // MARK: Actions
