@@ -16,6 +16,9 @@ class AccountSummaryViewController: UIViewController {
     var headerView = AccountSummaryHeaderView(frame: .zero)
     let refreshControl = UIRefreshControl()
     
+    // Networking
+    var profileManager: ProfileManageable = ProfileManager()
+    
     var isLoaded = false
     
     lazy var logoutBarButtonItem: UIBarButtonItem = {
@@ -35,6 +38,7 @@ extension AccountSummaryViewController {
         setupTableView()
         setupTableHeaderView()
 //        fetchAccounts()
+        setupRefreshControl()
         fetchData()
         setupNavigationBar()
 
@@ -78,17 +82,26 @@ extension AccountSummaryViewController {
         refreshControl.addTarget(self, action: #selector(refreshContent), for: .valueChanged)
         tableView.refreshControl = refreshControl
     }
-    
+    private func setupSkeletons() {
+        let row = Account.makeSkeleton()
+        accounts = Array(repeating: row, count: 10)
+        configureTableCells(with: accounts)
+    }
 }
 
 extension AccountSummaryViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard !accountCellViewModels.isEmpty else { return UITableViewCell() }
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: AccountSummaryCell.reuseID, for: indexPath) as! AccountSummaryCell
         let account = accountCellViewModels[indexPath.row]
-        cell.configure(with: account)
         
+        if isLoaded {
+            let cell = tableView.dequeueReusableCell(withIdentifier: AccountSummaryCell.reuseID, for: indexPath) as! AccountSummaryCell
+            cell.configure(with: account)
+            
+            return cell
+        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: SkeletonCell.reuseID, for: indexPath) as! SkeletonCell
         return cell
     }
     
@@ -111,21 +124,34 @@ extension AccountSummaryViewController {
         
         group.enter()
         
-        fetchProfile(forUserId: "1") { result in
+        profileManager.fetchProfile(forUserID: "1") { result in
             switch result {
             case .success(let profile):
                 self.profile = profile
                 self.configureTableHeaderView(with: profile)
             case .failure(let error):
-                print(error.localizedDescription)
+                let title: String
+                let message: String
+                switch error {
+                case .serverError :
+                    title = "Server Error"
+                    message = "Ensure you are connected to internet. Please try again"
+                case .decodingError:
+                    title = "Deconding Error"
+                    message = "Deconding Error"
+                 }
+                self.showErrorAler(title: title, message: message)
             }
             group.leave()
         }
         
         group.enter()
 
-        fetchAccounts(forUserId: "1") { result in
+        fetchAccounts(forUserId: "1") { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
+                
             case .success(let accounts):
                 self.accounts = accounts
                 self.configureTableCells(with: accounts)
@@ -136,6 +162,7 @@ extension AccountSummaryViewController {
 
         }
         group.notify(queue: .main) {
+            self.isLoaded = true
             self.tableView.reloadData()
             self.tableView.refreshControl?.endRefreshing()
         }
@@ -157,6 +184,12 @@ extension AccountSummaryViewController {
                                          balance: $0.amount)
         }
     }
+    private func showErrorAler(title: String, message: String) {
+        let alert = UIAlertController(title: "Network Error", message: "Please try again later", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
 }
 
 // MARK: Actions
@@ -166,6 +199,14 @@ extension AccountSummaryViewController {
     }
     
     @objc func refreshContent() {
+        reset()
+        setupSkeletons()
+        tableView.reloadData()
         fetchData()
+    }
+    private func reset() {
+        profile = nil
+        accounts = []
+        isLoaded = false
     }
 }
